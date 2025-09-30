@@ -1,0 +1,1377 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitradhara - Smart Farming Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .crop-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .price-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .pest-card {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .floating-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .price-trend-up {
+            color: #10b981;
+        }
+        
+        .price-trend-down {
+            color: #ef4444;
+        }
+        
+        .forum-post {
+            border-left: 4px solid #667eea;
+        }
+        
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-seedling text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold text-gray-800">Mitradhara</span>
+                </div>
+                
+                <div class="hidden md:flex space-x-2">
+                    <button onclick="showScreen('home')" class="nav-item px-4 py-2 rounded-lg active">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </button>
+                    <button onclick="showScreen('crops')" class="nav-item px-4 py-2 rounded-lg">
+                        <i class="fas fa-leaf mr-2"></i>Crops
+                    </button>
+                    <button onclick="showScreen('weather')" class="nav-item px-4 py-2 rounded-lg">
+                        <i class="fas fa-cloud-sun mr-2"></i>Weather
+                    </button>
+                    <button onclick="showScreen('prices')" class="nav-item px-4 py-2 rounded-lg">
+                        <i class="fas fa-chart-line mr-2"></i>Prices
+                    </button>
+                    <button onclick="showScreen('pest')" class="nav-item px-4 py-2 rounded-lg">
+                        <i class="fas fa-bug mr-2"></i>Pest Detection
+                    </button>
+                    <button onclick="showScreen('forum')" class="nav-item px-4 py-2 rounded-lg">
+                        <i class="fas fa-comments mr-2"></i>Forum
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+    <button class="p-2 text-gray-600 hover:text-gray-800 transition-colors">
+        <i class="fas fa-bell text-lg"></i>
+    </button>
+    <!-- Profile icon clickable -->
+    <a href="profile.html" class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center hover:bg-gray-400 transition cursor-pointer">
+        <i class="fas fa-user text-gray-600"></i>
+    </a>
+</div>
+
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div class="md:hidden bg-gray-50 border-t">
+            <div class="flex justify-around py-2">
+                <button onclick="showScreen('home')" class="nav-item p-3 rounded-lg active">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button onclick="showScreen('crops')" class="nav-item p-3 rounded-lg">
+                    <i class="fas fa-leaf"></i>
+                </button>
+                <button onclick="showScreen('weather')" class="nav-item p-3 rounded-lg">
+                    <i class="fas fa-cloud-sun"></i>
+                </button>
+                <button onclick="showScreen('prices')" class="nav-item p-3 rounded-lg">
+                    <i class="fas fa-chart-line"></i>
+                </button>
+                <button onclick="showScreen('pest')" class="nav-item p-3 rounded-lg">
+                    <i class="fas fa-bug"></i>
+                </button>
+                <button onclick="showScreen('forum')" class="nav-item p-3 rounded-lg">
+                    <i class="fas fa-comments"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen animate-fade-in">
+            <!-- Hero Section -->
+            <div class="gradient-bg rounded-2xl p-8 mb-8 text-white">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-4">Welcome to Smart Farming</h1>
+                        <p class="text-lg opacity-90 mb-6">Your intelligent companion for modern agriculture. Get real-time weather updates, crop insights, market prices, and connect with fellow farmers.</p>
+                        <button class="bg-white text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                            Get Started
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/44d950ba-de22-48a1-862b-0e188363bc97.png" alt="Modern smart farming technology with sensors, drones, and IoT devices monitoring crops in a green field" class="rounded-xl shadow-2xl" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-leaf text-green-600 text-xl"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">127</div>
+                        <div class="text-sm text-gray-600">Crops Tracked</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-thermometer-half text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">24°C</div>
+                        <div class="text-sm text-gray-600">Temperature</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">₹2,340</div>
+                        <div class="text-sm text-gray-600">Avg Price</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-users text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">1.2K</div>
+                        <div class="text-sm text-gray-600">Community</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover cursor-pointer" onclick="showScreen('crops')">
+                    <div class="crop-card h-32 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="fas fa-seedling text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Crop Information</h3>
+                    <p class="text-gray-600 mb-4">Get detailed information about different crops, planting seasons, and care instructions.</p>
+                    <button class="text-purple-600 font-semibold hover:text-purple-700">Learn More →</button>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover cursor-pointer" onclick="showScreen('weather')">
+                    <div class="weather-card h-32 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="fas fa-cloud-sun text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Weather Forecast</h3>
+                    <p class="text-gray-600 mb-4">Real-time weather updates and 7-day forecasts to plan your farming activities.</p>
+                    <button class="text-blue-600 font-semibold hover:text-blue-700">Check Weather →</button>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover cursor-pointer" onclick="showScreen('prices')">
+                    <div class="price-card h-32 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="fas fa-rupee-sign text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Market Prices</h3>
+                    <p class="text-gray-600 mb-4">Live market prices and trends for various crops across different markets.</p>
+                    <button class="text-green-600 font-semibold hover:text-green-700">View Prices →</button>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover cursor-pointer" onclick="showScreen('pest')">
+                    <div class="pest-card h-32 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="fas fa-bug text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Pest Detection</h3>
+                    <p class="text-gray-600 mb-4">AI-powered pest and disease detection to protect your crops effectively.</p>
+                    <button class="text-pink-600 font-semibold hover:text-pink-700">Detect Pests →</button>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover cursor-pointer" onclick="showScreen('forum')">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-32 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="fas fa-comments text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Farmer Forum</h3>
+                    <p class="text-gray-600 mb-4">Connect with fellow farmers, share experiences, and get expert advice.</p>
+                    <button class="text-indigo-600 font-semibold hover:text-indigo-700">Join Discussion →</button>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover cursor-pointer" onclick="openSmartTools()">
+    <div class="bg-gradient-to-r from-orange-500 to-red-500 h-32 rounded-lg mb-4 flex items-center justify-center">
+        <i class="fas fa-tools text-white text-3xl"></i>
+    </div>
+    <h3 class="text-xl font-semibold mb-2">Smart Tools</h3>
+    <p class="text-gray-600 mb-4">Access various farming tools and calculators for better decision making.</p>
+    <button class="text-orange-600 font-semibold hover:text-orange-700">Explore Tools →</button>
+</div>
+            </div>
+        </div>
+
+        <!-- Crop Information Screen -->
+        <div id="crops-screen" class="screen hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Crop Information</h2>
+                <p class="text-gray-600">Comprehensive information about different crops, their growing seasons, and care instructions.</p>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <input type="text" placeholder="Search crops..." class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <select class="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All Seasons</option>
+                        <option>Kharif</option>
+                        <option>Rabi</option>
+                        <option>Zaid</option>
+                    </select>
+                    <select class="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All Categories</option>
+                        <option>Cereals</option>
+                        <option>Pulses</option>
+                        <option>Vegetables</option>
+                        <option>Fruits</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Crop Cards -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/74019823-5702-4bc7-a538-8e9b5ec46581.png" alt="Golden wheat field during harvest season with tall stalks swaying in the wind" class="w-full h-48 object-cover" />
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Wheat</h3>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Rabi</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Winter crop, sown in November-December and harvested in April-May.</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Sowing Time:</span>
+                                <span class="font-medium">Nov - Dec</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Time:</span>
+                                <span class="font-medium">Apr - May</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Temperature:</span>
+                                <span class="font-medium">15-25°C</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/2381c2e6-8bef-43d7-9c40-00307ae243b5.png" alt="Lush green rice paddy fields with water reflection and young rice plants growing in rows" class="w-full h-48 object-cover" />
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Rice</h3>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Kharif</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Monsoon crop, requires abundant water and warm climate for growth.</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">ate
+                                <span class="text-gray-500">Sowing Time:</span>
+                                <span class="font-medium">Jun - Jul</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Time:</span>
+                                <span class="font-medium">Oct - Nov</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Temperature:</span>
+                                <span class="font-medium">20-35°C</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/02a01717-4c1a-4e5b-a27e-8f93dfa0e31b.png" alt="Fresh ripe tomatoes growing on green vines in a well-maintained vegetable garden with red tomatoes hanging in clusters" class="w-full h-48 object-cover" />
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Tomato</h3>
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">Vegetable</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Popular vegetable crop, can be grown in multiple seasons with proper care.</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Sowing Time:</span>
+                                <span class="font-medium">Sep - Oct</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Time:</span>
+                                <span class="font-medium">Dec - Feb</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Temperature:</span>
+                                <span class="font-medium">18-25°C</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/03f30562-0695-4672-95ae-22a81e4609d2.png" alt="Mature cotton plants with white cotton bolls ready for harvest in a vast cotton field under blue sky" class="w-full h-48 object-cover" />
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Cotton</h3>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">Cash Crop</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Important cash crop requiring warm climate and moderate rainfall.</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Sowing Time:</span>
+                                <span class="font-medium">May - Jun</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Time:</span>
+                                <span class="font-medium">Oct - Dec</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Temperature:</span>
+                                <span class="font-medium">21-27°C</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cdc18a96-0c78-4a39-8871-f2717508aa00.png" alt="Maize corn field with tall green stalks and yellow corn cobs ready for harvest in agricultural farmland" class="w-full h-48 object-cover" />
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Maize</h3>
+                            <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">Cereal</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Versatile crop used for food, fodder, and industrial purposes.</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Sowing Time:</span>
+                                <span class="font-medium">Jun - Jul</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Time:</span>
+                                <span class="font-medium">Sep - Oct</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Temperature:</span>
+                                <span class="font-medium">20-30°C</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a0d80ff5-821e-492d-a0bf-d162a7cbe99a.png" alt="Field of golden chickpea plants with small pods containing legumes growing in dry agricultural land" class="w-full h-48 object-cover" />
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Chickpea</h3>
+                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Pulse</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Important protein-rich pulse crop, drought-resistant and nutritious.</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Sowing Time:</span>
+                                <span class="font-medium">Oct - Nov</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Time:</span>
+                                <span class="font-medium">Mar - Apr</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Temperature:</span>
+                                <span class="font-medium">20-25°C</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Screen -->
+        <div id="weather-screen" class="screen hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Weather Forecast</h2>
+                <p class="text-gray-600">Real-time weather updates and forecasts to help you plan your farming activities.</p>
+            </div>
+
+            <!-- Current Weather -->
+            <div class="bg-gradient-to-r from-blue-400 to-blue-600 rounded-2xl p-8 text-white mb-8">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span class="text-lg">Vijayawada, India</span>
+                        </div>
+                        <div class="text-6xl font-light mb-2">32°C</div>
+                        <div class="text-xl mb-4">Cloudy</div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-sm opacity-80">Humidity</div>
+                                <div class="text-lg font-semibold">89%</div>
+                            </div>
+                            <div>
+                                <div class="text-sm opacity-80">Wind Speed</div>
+                                <div class="text-lg font-semibold">11.7 km/h</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4aa68cea-0c34-4dd4-9f5a-191cbca128e9.png" alt="Partly cloudy sky with white fluffy clouds and blue sky with sunshine peeking through" class="rounded-xl shadow-lg mx-auto" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Details -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Today's Details</h3>
+                        <i class="fas fa-sun text-yellow-500 text-xl"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Feels like</span>
+                            <span class="font-semibold">28°C</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">UV Index</span>
+                            <span class="font-semibold">6 (High)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Pressure</span>
+                            <span class="font-semibold">1013 hPa</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Visibility</span>
+                            <span class="font-semibold">10 km</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Precipitation</h3>
+                        <i class="fas fa-cloud-rain text-blue-500 text-xl"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Chance of rain</span>
+                            <span class="font-semibold">90%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Today</span>
+                            <span class="font-semibold">0 mm</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">This week</span>
+                            <span class="font-semibold">15 mm</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Last 30 days</span>
+                            <span class="font-semibold">82 mm</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Farming Advice</h3>
+                        <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="p-3 bg-green-50 border-l-4 border-green-500 rounded">
+                            <div class="text-green-800 font-semibold">Good for irrigation</div>
+                            <div class="text-green-600">Low humidity is ideal for watering crops</div>
+                        </div>
+                        <div class="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                            <div class="text-yellow-800 font-semibold">Moderate UV</div>
+                            <div class="text-yellow-600">Protect workers during midday</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7-Day Forecast -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-6">7-Day Forecast</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-sun text-yellow-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Today</div>
+                                <div class="text-sm text-gray-600">Sunny</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">28° / 18°</div>
+                            <div class="text-sm text-gray-600">0% rain</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cloud text-blue-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Tomorrow</div>
+                                <div class="text-sm text-gray-600">Cloudy</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">25° / 16°</div>
+                            <div class="text-sm text-gray-600">10% rain</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cloud-rain text-blue-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Wednesday</div>
+                                <div class="text-sm text-gray-600">Light Rain</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">22° / 14°</div>
+                            <div class="text-sm text-gray-600">60% rain</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cloud text-gray-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Thursday</div>
+                                <div class="text-sm text-gray-600">Overcast</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">23° / 15°</div>
+                            <div class="text-sm text-gray-600">30% rain</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cloud-sun text-yellow-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Friday</div>
+                                <div class="text-sm text-gray-600">Partly Cloudy</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">26° / 17°</div>
+                            <div class="text-sm text-gray-600">15% rain</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Prices Screen -->
+        <div id="prices-screen" class="screen hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Market Prices</h2>
+                <p class="text-gray-600">Live market prices and trends for various crops across different markets.</p>
+            </div>
+
+            <!-- Market Selection -->
+            <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <select class="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option>Select Market</option>
+                        <option>Delhi</option>
+                        <option>Mumbai</option>
+                        <option>Kolkata</option>
+                        <option>Chennai</option>
+                    </select>
+                    <select class="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option>All Categories</option>
+                        <option>Cereals</option>
+                        <option>Vegetables</option>
+                        <option>Fruits</option>
+                        <option>Pulses</option>
+                    </select>
+                    <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh Prices
+                    </button>
+                </div>
+            </div>
+
+            <!-- Price Summary Cards -->
+            <div class="grid md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-arrow-up text-green-600"></i>
+                        </div>
+                        <span class="text-green-600 text-sm font-semibold">+12.5%</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">Highest Gainer</div>
+                    <div class="text-sm text-gray-600">Tomato - ₹45/kg</div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-arrow-down text-red-600"></i>
+                        </div>
+                        <span class="text-red-600 text-sm font-semibold">-8.3%</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">Highest Loser</div>
+                    <div class="text-sm text-gray-600">Onion - ₹28/kg</div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-blue-600"></i>
+                        </div>
+                        <span class="text-blue-600 text-sm font-semibold">Avg</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">Market Average</div>
+                    <div class="text-sm text-gray-600">₹2,340/quintal</div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clock text-yellow-600"></i>
+                        </div>
+                        <span class="text-yellow-600 text-sm font-semibold">Live</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">Last Updated</div>
+                    <div class="text-sm text-gray-600">2 minutes ago</div>
+                </div>
+            </div>
+
+            <!-- Price Table -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-xl font-semibold">Current Market Prices</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left py-4 px-6 font-semibold text-gray-700">Commodity</th>
+                                <th class="text-left py-4 px-6 font-semibold text-gray-700">Market</th>
+                                <th class="text-right py-4 px-6 font-semibold text-gray-700">Price (₹/kg)</th>
+                                <th class="text-right py-4 px-6 font-semibold text-gray-700">Change</th>
+                                <th class="text-right py-4 px-6 font-semibold text-gray-700">Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-seedling text-yellow-600"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Wheat</div>
+                                            <div class="text-sm text-gray-600">Cereal</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">Delhi</td>
+                                <td class="py-4 px-6 text-right font-semibold">₹24.50</td>
+                                <td class="py-4 px-6 text-right">
+                                    <span class="price-trend-up font-semibold">+₹2.30</span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <i class="fas fa-arrow-up price-trend-up"></i>
+                                </td>
+                            </tr>
+                            
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-leaf text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Rice</div>
+                                            <div class="text-sm text-gray-600">Cereal</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">Mumbai</td>
+                                <td class="py-4 px-6 text-right font-semibold">₹42.00</td>
+                                <td class="py-4 px-6 text-right">
+                                    <span class="price-trend-down font-semibold">-₹1.50</span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <i class="fas fa-arrow-down price-trend-down"></i>
+                                </td>
+                            </tr>
+                            
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-apple-alt text-red-600"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Tomato</div>
+                                            <div class="text-sm text-gray-600">Vegetable</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">Delhi</td>
+                                <td class="py-4 px-6 text-right font-semibold">₹45.00</td>
+                                <td class="py-4 px-6 text-right">
+                                    <span class="price-trend-up font-semibold">+₹5.20</span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <i class="fas fa-arrow-up price-trend-up"></i>
+                                </td>
+                            </tr>
+                            
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-circle text-purple-600"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Onion</div>
+                                            <div class="text-sm text-gray-600">Vegetable</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">Chennai</td>
+                                <td class="py-4 px-6 text-right font-semibold">₹28.00</td>
+                                <td class="py-4 px-6 text-right">
+                                    <span class="price-trend-down font-semibold">-₹2.50</span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <i class="fas fa-arrow-down price-trend-down"></i>
+                                </td>
+                            </tr>
+                            
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-carrot text-orange-600"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Potato</div>
+                                            <div class="text-sm text-gray-600">Vegetable</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">Kolkata</td>
+                                <td class="py-4 px-6 text-right font-semibold">₹18.50</td>
+                                <td class="py-4 px-6 text-right">
+                                    <span class="price-trend-up font-semibold">+₹0.80</span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <i class="fas fa-arrow-up price-trend-up"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pest Detection Screen -->
+        <div id="pest-screen" class="screen hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Pest Detection</h2>
+                <p class="text-gray-600">AI-powered pest and disease detection to protect your crops effectively.</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-camera text-blue-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Upload Crop Image</h3>
+                    <p class="text-gray-600 mb-6">Take a photo or upload an image of your crop for AI-powered pest detection</p>
+                    
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-12 mb-6 hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('file-input').click()">
+                        <div class="text-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <div class="text-lg font-semibold text-gray-700 mb-2">Drop your image here</div>
+                            <div class="text-gray-500">or click to browse</div>
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="openCamera()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-camera mr-2"></i>Take Photo
+                        </button>
+                        <button onclick="document.getElementById('file-input').click()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-upload mr-2"></i>Upload Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Result -->
+            <div id="analysis-result" class="hidden bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h3 class="text-xl font-semibold mb-6">Analysis Result</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <img id="uploaded-image" src="" alt="Uploaded crop image for pest analysis" class="w-full rounded-lg shadow-md mb-4" / src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/6f774438-46e3-41ad-affd-c498b1c42d15.png">
+                        <button onclick="analyzeAnother()" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                            Analyze Another Image
+                        </button>
+                    </div>
+                    <div>
+                        <div class="space-y-6">
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                                    <span class="font-semibold text-red-800">Pest Detected</span>
+                                </div>
+                                <div class="text-lg font-semibold text-red-800 mb-2">Aphids (Green Peach Aphid)</div>
+                                <div class="text-sm text-red-700">Confidence: 87%</div>
+                            </div>
+                            
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <div class="font-semibold text-yellow-800 mb-2">Severity Level</div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="flex space-x-1">
+                                        <div class="w-4 h-4 bg-yellow-500 rounded"></div>
+                                        <div class="w-4 h-4 bg-yellow-500 rounded"></div>
+                                        <div class="w-4 h-4 bg-yellow-500 rounded"></div>
+                                        <div class="w-4 h-4 bg-gray-300 rounded"></div>
+                                        <div class="w-4 h-4 bg-gray-300 rounded"></div>
+                                    </div>
+                                    <span class="text-sm text-yellow-700">Moderate</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="font-semibold text-blue-800 mb-3">Recommended Actions</div>
+                                <ul class="space-y-2 text-sm text-blue-700">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                        Apply neem oil spray in early morning or evening
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                        Introduce beneficial insects like ladybugs
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                        Monitor plants daily for 1-2 weeks
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                        Avoid over-fertilization with nitrogen
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Common Pests -->
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-xl font-semibold mb-6">Common Pests & Diseases</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/45775479-5ecb-4cb4-a91a-b8db91bd9428.png" alt="Green aphids clustered on plant stems and leaves causing damage to crops" class="w-full h-32 object-cover rounded-lg mb-3" />
+                        <h4 class="font-semibold mb-2">Aphids</h4>
+                        <p class="text-sm text-gray-600 mb-3">Small, soft-bodied insects that feed on plant sap</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">High Risk</span>
+                            <button class="text-blue-600 text-sm hover:text-blue-700">Learn More</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/69977e83-3794-450b-bc24-ba22dadb0395.png" alt="Brown and white fungal disease spots on green plant leaves showing blight symptoms" class="w-full h-32 object-cover rounded-lg mb-3" />
+                        <h4 class="font-semibold mb-2">Leaf Blight</h4>
+                        <p class="text-sm text-gray-600 mb-3">Fungal disease causing brown spots on leaves</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Medium Risk</span>
+                            <button class="text-blue-600 text-sm hover:text-blue-700">Learn More</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/b7e085c0-1b88-4fcd-a1f7-45f6612050d2.png" alt="Green caterpillars eating and damaging crop leaves with visible bite marks and holes" class="w-full h-32 object-cover rounded-lg mb-3" />
+                        <h4 class="font-semibold mb-2">Caterpillars</h4>
+                        <p class="text-sm text-gray-600 mb-3">Larvae that eat leaves and damage crops</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Medium Risk</span>
+                            <button class="text-blue-600 text-sm hover:text-blue-700">Learn More</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7d4f9d85-2944-4f87-b875-286ae8ab5246.png" alt="White powdery mildew fungal infection covering plant leaves with dusty white appearance" class="w-full h-32 object-cover rounded-lg mb-3" />
+                        <h4 class="font-semibold mb-2">Powdery Mildew</h4>
+                        <p class="text-sm text-gray-600 mb-3">White powdery fungal growth on leaves</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Medium Risk</span>
+                            <button class="text-blue-600 text-sm hover:text-blue-700">Learn More</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7f486f4c-9850-4873-9284-8c27d6c03af3.png" alt="Small red spider mites on plant leaves with fine webbing visible on leaf surfaces" class="w-full h-32 object-cover rounded-lg mb-3" />
+                        <h4 class="font-semibold mb-2">Spider Mites</h4>
+                        <p class="text-sm text-gray-600 mb-3">Tiny arachnids that cause stippling damage</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">High Risk</span>
+                            <button class="text-blue-600 text-sm hover:text-blue-700">Learn More</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/24c29637-1940-4df0-967e-d1a738aa00f5.png" alt="Orange and black rust fungal disease spots covering crop leaves with spore pustules" class="w-full h-32 object-cover rounded-lg mb-3" />
+                        <h4 class="font-semibold mb-2">Rust Disease</h4>
+                        <p class="text-sm text-gray-600 mb-3">Fungal disease causing orange-brown pustules</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Low Risk</span>
+                            <button class="text-blue-600 text-sm hover:text-blue-700">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forum Screen -->
+        <div id="forum-screen" class="screen hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Farmer Forum</h2>
+                <p class="text-gray-600">Connect with fellow farmers, share experiences, and get expert advice.</p>
+            </div>
+
+            <!-- Create Post -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">Share Your Experience</h3>
+                <div class="space-y-4">
+                    <input type="text" placeholder="What's on your mind?" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <textarea placeholder="Share your farming experience, ask questions, or give advice..." rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                                <i class="fas fa-image"></i>
+                                <span>Photo</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Location</span>
+                            </button>
+                        </div>
+                        <button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                            Post
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <button class="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-question-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div class="font-semibold text-gray-800">Questions</div>
+                    <div class="text-sm text-gray-600">1,234 posts</div>
+                </button>
+                
+                <button class="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-lightbulb text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="font-semibold text-gray-800">Tips</div>
+                    <div class="text-sm text-gray-600">856 posts</div>
+                </button>
+                
+                <button class="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="font-semibold text-gray-800">Issues</div>
+                    <div class="text-sm text-gray-600">432 posts</div>
+                </button>
+                
+                <button class="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-star text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="font-semibold text-gray-800">Success</div>
+                    <div class="text-sm text-gray-600">289 posts</div>
+                </button>
+            </div>
+
+            <!-- Forum Posts -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6 forum-post">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold">RK</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-semibold text-gray-800">Raj Kumar</span>
+                                <span class="text-gray-500 text-sm">• 2 hours ago</span>
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Question</span>
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">Best time to plant tomatoes in Delhi?</h4>
+                            <p class="text-gray-600 mb-4">I'm planning to start tomato cultivation in Delhi. Can someone suggest the best time to plant and any specific varieties that work well in this region?</p>
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a4e05b52-e2da-47bb-9500-6f3c3ca38fe5.png" alt="Tomato seedlings in small pots ready for transplanting in a greenhouse nursery setting" class="w-full max-w-md rounded-lg mb-4" />
+                            <div class="flex items-center space-x-6 text-gray-500">
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>24</span>
+                                </button>
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-comment"></i>
+                                    <span>12 replies</span>
+                                </button>
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-share"></i>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 forum-post">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold">PS</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-semibold text-gray-800">Priya Sharma</span>
+                                <span class="text-gray-500 text-sm">• 5 hours ago</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Success</span>
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">Amazing harvest this season!</h4>
+                            <p class="text-gray-600 mb-4">Just completed harvesting my wheat crop and the yield was 20% higher than last year. Using organic fertilizers and proper irrigation timing made all the difference!</p>
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7c2ffdbf-6be6-4223-aa2a-12dd31f6e29d.png" alt="Abundant wheat harvest with golden grain piled high showing successful organic farming results" class="w-full max-w-md rounded-lg mb-4" />
+                            <div class="flex items-center space-x-6 text-gray-500">
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>56</span>
+                                </button>
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-comment"></i>
+                                    <span>23 replies</span>
+                                </button>
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-share"></i>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 forum-post">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold">AM</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-semibold text-gray-800">Amit Singh</span>
+                                <span class="text-gray-500 text-sm">• 1 day ago</span>
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Tip</span>
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">Natural pest control methods that actually work</h4>
+                            <p class="text-gray-600 mb-4">After years of experimenting, here are 5 natural pest control methods that have given me great results without using harmful chemicals...</p>
+                            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-leaf text-green-600 mt-1 mr-2"></i>
+                                        Neem oil spray - works great against aphids
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-leaf text-green-600 mt-1 mr-2"></i>
+                                        Companion planting with marigolds
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-leaf text-green-600 mt-1 mr-2"></i>
+                                        Beneficial insects like ladybugs
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center space-x-6 text-gray-500">
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>89</span>
+                                </button>
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-comment"></i>
+                                    <span>34 replies</span>
+                                </button>
+                                <button class="flex items-center space-x-2 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-share"></i>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More -->
+            <div class="text-center mt-8">
+                <button class="bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                    Load More Posts
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="floating-button bg-blue-500 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-600 transition-colors">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+    <script>
+        // Function to open AI Assistant from Smart Tools
+function openSmartTools() {
+    window.location.href = 'AI.html';
+}
+        // Screen navigation
+        function showScreen(screenName) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            
+            // Show selected screen
+            document.getElementById(screenName + '-screen').classList.remove('hidden');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // Image upload handling
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('uploaded-image').src = e.target.result;
+                    document.getElementById('analysis-result').classList.remove('hidden');
+                    // Simulate analysis delay
+                    setTimeout(() => {
+                        // Analysis complete - result is already shown in HTML
+                    }, 2000);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Camera functionality
+        function openCamera() {
+            // In a real app, this would open the device camera
+            alert('Camera functionality would open here in a real mobile app');
+        }
+
+        // Analyze another image
+        function analyzeAnother() {
+            document.getElementById('analysis-result').classList.add('hidden');
+            document.getElementById('file-input').value = '';
+        }
+
+        // Simulated weather data update
+        function updateWeatherData() {
+            // This would fetch real weather data in production
+            console.log('Weather data updated');
+        }
+
+        // Price data refresh
+        function refreshPriceData() {
+            // This would fetch real price data in production
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-sync-alt loading-spinner mr-2"></i>Refreshing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show home screen by default
+            showScreen('home');
+            
+            // Auto-refresh weather data every 5 minutes
+            setInterval(updateWeatherData, 300000);
+            
+            // Initialize any other components
+            console.log('Mitradhara app initialized');
+        });
+
+        // Responsive navigation for mobile
+        function toggleMobileNav() {
+            // Mobile navigation toggle logic
+        }
+
+        // Forum interactions
+        function likePost(postId) {
+            // Handle post likes
+        }
+
+        function sharePost(postId) {
+            // Handle post sharing
+        }
+
+        // Search functionality
+        function searchCrops(query) {
+            // Handle crop search
+        }
+
+        // Filter functionality
+        function filterByCategory(category) {
+            // Handle category filtering
+        }
+    </script>
+</body>
+</html>
+
